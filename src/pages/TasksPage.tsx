@@ -14,6 +14,7 @@ export default function TasksPage() {
   const { request } = useApi();
   const { role } = useAuthStore();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [testError, setTestError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
@@ -159,6 +160,10 @@ async function suggestSubtasks(task: TaskItem) {
         Loading tasks...
       </div>
     );
+  }
+
+  if (testError) {
+    throw new Error("Test error for ErrorBoundary");
   }
 
   return (

@@ -6,6 +6,7 @@ export default function Login() {
   const { setAuth } = useAuthStore();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [testError, setTestError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +52,10 @@ export default function Login() {
     // Redirigir
     window.location.href = "/tasks";
   };
+
+  if (testError) {
+    throw new Error("Test error from Login");
+  }
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100">
