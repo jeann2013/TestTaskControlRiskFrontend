@@ -31,12 +31,14 @@ const [suggestResult, setSuggestResult] = useState<any | null>(null);
 
   async function loadTasks() {
     try {
-      const res = await request("https://localhost:7179/tasks");
+      const res = await request("https://localhost:7179/tasks?Page=1&PageSize=10");
 
       if (!res.ok) throw new Error("Failed to load tasks");
 
       const data = await res.json();
-      setTasks(data);
+      
+      const tasksArray = Array.isArray(data) ? data : (data.items || data.tasks || data.data || []);
+      setTasks(tasksArray);
     } catch (err) {
       console.error(err);
       alert("Error loading tasks");
@@ -52,9 +54,9 @@ const [suggestResult, setSuggestResult] = useState<any | null>(null);
   function startEditing(task: TaskItem) {
     setEditingTask(task);
     setEditForm({
-      title: task.title,
-      description: task.description,
-      priority: task.priority ?? "pending",
+      title: task.title || (task as any).Title,
+      description: task.description || (task as any).Description,
+      priority: (task.priority || (task as any).Priority) ?? "pending",
     });
   }
 
@@ -133,7 +135,7 @@ async function suggestSubtasks(task: TaskItem) {
     if (!editingTask) return;
 
     const res = await request(
-      `https://localhost:7179/tasks/${editingTask.id}`,
+      `https://localhost:7179/tasks/${editingTask.id || (editingTask as any).Id}`,
       {
         method: "PUT",
         body: JSON.stringify(editForm),
@@ -177,14 +179,14 @@ async function suggestSubtasks(task: TaskItem) {
         <ul className="space-y-4">
           {tasks.map((task) => (
           <li
-            key={task.id}
-            className={`bg-gray-800 p-4 rounded mb-2 flex justify-between items-start ${
-              task.priority === "done" ? "opacity-50 line-through" : ""
+            key={task.id || (task as any).Id}
+            className={`bg-white p-4 rounded mb-2 border flex justify-between items-start ${
+              (task.priority || (task as any).Priority) === "done" ? "opacity-50 line-through" : ""
             }`}
           >
             <div>
-              <h3 className="text-lg font-bold">{task.title}</h3>
-              <p className="text-gray-400">{task.description}</p>
+              <h3 className="text-lg font-bold text-black">{task.title || (task as any).Title}</h3>
+              <p className="text-gray-600">{task.description || (task as any).Description}</p>
             </div>
 
             <div className="flex flex-col gap-2 ml-4">
@@ -195,10 +197,10 @@ async function suggestSubtasks(task: TaskItem) {
                 Edit
               </button>
 
-              {task.priority !== "done" && (
+              {(task.priority || (task as any).Priority) !== "done" && (
                 <button
                   className="bg-green-600 px-3 py-1 rounded"
-                  onClick={() => completeTask(task.id)}
+                  onClick={() => completeTask(task.id || (task as any).Id)}
                 >
                   Complete
                 </button>
@@ -206,7 +208,7 @@ async function suggestSubtasks(task: TaskItem) {
 
               <button
                 className="bg-red-600 px-3 py-1 rounded"
-                onClick={() => deleteTask(task.id)}
+                onClick={() => deleteTask(task.id || (task as any).Id)}
               >
                 Delete
               </button>

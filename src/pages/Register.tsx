@@ -1,43 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuthStore } from "../auth/useAuthStore";
 
-export default function Login() {
-  const { setAuth } = useAuthStore();
+export default function Register() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("https://localhost:7179/auth/login", {
+    const res = await fetch("https://localhost:7179/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
 
     if (!res.ok) {
-      alert("Credenciales inválidas");
+      alert("Registration failed");
       return;
     }
 
-    const resClone = res.clone();
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      // If not JSON, assume plain text token
-      data = { token: await resClone.text() };
-    }
-
-    // Guardar token
-    const token = data.Token || data.token || data.access_token || data.accessToken || data.AccessToken;
-    const refreshToken = data.RefreshToken || data.refresh_token || data.refreshToken;
-    console.log("Parsed token:", token);
-    setAuth({ token, refreshToken, user: data.user });
-
-    // Redirigir
-    window.location.href = "/tasks";
+    alert("Registration successful! Please login.");
+    window.location.href = "/";
   };
 
   return (
@@ -46,7 +29,7 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded shadow w-96 space-y-4"
       >
-        <h1 className="text-2xl font-bold">Login</h1>
+        <h1 className="text-2xl font-bold">Register</h1>
 
         <input
           type="email"
@@ -70,11 +53,11 @@ export default function Login() {
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded"
         >
-          Login
+          Register
         </button>
 
         <p className="text-center">
-          Don't have an account? <Link to="/register" className="text-blue-600">Register</Link>
+          Already have an account? <Link to="/" className="text-blue-600">Login</Link>
         </p>
       </form>
     </div>

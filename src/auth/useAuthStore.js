@@ -1,14 +1,31 @@
 import { create } from "zustand";
 
+const getInitialState = () => {
+  const token = localStorage.getItem("token");
+  const refreshToken = localStorage.getItem("refreshToken");
+  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+  return { token, refreshToken, user };
+};
+
 export const useAuthStore = create((set) => ({
-  token: null,
-  refreshToken: null,
-  user: null,
+  ...getInitialState(),
 
-  setAuth: ({ token, refreshToken, user }) =>
-    set({ token, refreshToken, user }),
+  setAuth: ({ token, refreshToken, user }) => {
+    localStorage.setItem("token", token);
+    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    set({ token, refreshToken, user });
+  },
 
-  setToken: (token) => set({ token }),
+  setToken: (token) => {
+    localStorage.setItem("token", token);
+    set({ token });
+  },
 
-  logout: () => set({ token: null, refreshToken: null, user: null }),
+  logout: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    set({ token: null, refreshToken: null, user: null });
+  },
 }));

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import TasksPage from "./pages/TasksPage";
 import PrivateRoute from "./components/PrivateRoute";
 import CreateTaskPage from "./pages/CreateTaskPage";
@@ -9,6 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/create" element={<CreateTaskPage />} />
 
 
