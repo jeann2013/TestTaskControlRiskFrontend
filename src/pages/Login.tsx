@@ -11,46 +11,50 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("https://localhost:7179/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!res.ok) {
-      alert("Credenciales inválidas");
-      return;
-    }
-
-    const resClone = res.clone();
-    let data;
     try {
-      data = await res.json();
-    } catch {
-      // If not JSON, assume plain text token
-      data = { token: await resClone.text() };
-    }
+      const res = await fetch("https://localhost:7179/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Guardar token
-    const token = data.Token || data.token || data.access_token || data.accessToken || data.AccessToken;
-    const refreshToken = data.RefreshToken || data.refresh_token || data.refreshToken;
-    console.log("Parsed token:", token);
-
-    // Decode JWT to get role
-    let role = null;
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role;
-      } catch (e) {
-        console.error("Failed to decode token:", e);
+      if (!res.ok) {
+        alert("Credenciales inválidas");
+        return;
       }
+
+      const resClone = res.clone();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        // If not JSON, assume plain text token
+        data = { token: await resClone.text() };
+      }
+
+      // Guardar token
+      const token = data.Token || data.token || data.access_token || data.accessToken || data.AccessToken;
+      const refreshToken = data.RefreshToken || data.refresh_token || data.refreshToken;
+      console.log("Parsed token:", token);
+
+      // Decode JWT to get role
+      let role = null;
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role;
+        } catch (e) {
+          console.error("Failed to decode token:", e);
+        }
+      }
+
+      setAuth({ token, refreshToken, user: data.user, role });
+
+      // Redirigir
+      window.location.href = "/tasks";
+    } catch (error) {
+      alert("Error de conexión. Verifica que el backend esté ejecutándose.");
     }
-
-    setAuth({ token, refreshToken, user: data.user, role });
-
-    // Redirigir
-    window.location.href = "/tasks";
   };
 
   if (testError) {

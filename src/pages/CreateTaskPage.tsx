@@ -17,15 +17,19 @@ export default function CreateTaskPage() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await request("https://localhost:7179/tasks", {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await request("https://localhost:7179/tasks", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
 
-    if (res.ok) {
-      navigate("/tasks");
-    } else {
-      alert("Error creating task");
+      if (res.ok) {
+        navigate("/tasks");
+      } else {
+        alert("Ocurrió un error inesperado");
+      }
+    } catch (err) {
+      alert("Ocurrió un error inesperado");
     }
 
     setLoading(false);

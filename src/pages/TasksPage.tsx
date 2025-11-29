@@ -44,7 +44,7 @@ const [suggestResult, setSuggestResult] = useState<any | null>(null);
       setTasks(tasksArray);
     } catch (err) {
       console.error(err);
-      alert("Error loading tasks");
+      alert("Ocurrió un error inesperado");
     } finally {
       setLoading(false);
     }
@@ -64,94 +64,124 @@ const [suggestResult, setSuggestResult] = useState<any | null>(null);
   }
 
   async function analyzeTask(task: TaskItem) {
-  const res = await request("https://localhost:7179/tasks/analyze", {
-    method: "POST",
-    body: JSON.stringify({ text: task.description })
-  });
-
-  if (!res.ok) {
-    alert("Error analyzing task");
-    return;
+    try {
+      const res = await request("https://localhost:7179/tasks/analyze", {
+        method: "POST",
+        body: JSON.stringify({ text: task.description })
+      });
+ 
+      if (!res.ok) {
+        alert("Ocurrió un error inesperado");
+        return;
+      }
+ 
+      const data = await res.json();
+      setAiResult(data);
+    } catch (err) {
+      alert("Ocurrió un error inesperado");
+    }
   }
-
-  const data = await res.json();
-  setAiResult(data);
-}
 
 async function suggestSubtasks(task: TaskItem) {
-  const res = await request("https://localhost:7179/tasks/suggest", {
-    method: "POST",
-    body: JSON.stringify({ text: task.description })
-  });
+  try {
+    const res = await request("https://localhost:7179/tasks/suggest", {
+      method: "POST",
+      body: JSON.stringify({ text: task.description })
+    });
 
-  if (!res.ok) {
-    alert("Error getting suggestions");
-    return;
+    if (!res.ok) {
+      alert("Ocurrió un error inesperado");
+      return;
+    }
+
+    const data = await res.json();
+    setSuggestResult(data);
+  } catch (err) {
+    alert("Ocurrió un error inesperado");
   }
-
-  const data = await res.json();
-  setSuggestResult(data);
 }
 
 
   async function completeTask(id: string) {
-  const res = await request(`https://localhost:7179/tasks/${id}/complete`, {
-    method: "PATCH",
-  });
-
-  if (!res.ok) {
-    alert("Error completing task");
-    return;
+    const taskToComplete = tasks.find(t => t.id === id);
+    if (!taskToComplete) return;
+ 
+    const originalPriority = taskToComplete.priority;
+ 
+    // Optimistic update
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, priority: "done" } : t
+      )
+    );
+ 
+    try {
+      const res = await request(`https://localhost:7179/tasks/${id}/complete`, {
+        method: "PATCH",
+      });
+ 
+      if (!res.ok) throw new Error("Failed to complete");
+ 
+      alert("Task marked as completed!");
+    } catch (err) {
+      // Rollback
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, priority: originalPriority } : t
+        )
+      );
+      alert("Ocurrió un error inesperado");
+    }
   }
-
-  // Update the UI without reloading everything
-  setTasks((prev) =>
-    prev.map((t) =>
-      t.id === id ? { ...t, priority: "done" } : t
-    )
-  );
-
-  alert("Task marked as completed!");
-}
 
 
   async function deleteTask(id: string) {
-    if (!confirm("Are you sure you want to delete this task?")) return;
-
-    const res = await request(`https://localhost:7179/tasks/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
-      alert("Error deleting task");
-      return;
-    }
-
-    // Remove task from UI instantly (Optimistic Update)
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-
-    alert("Task deleted");
-}
+      if (!confirm("Are you sure you want to delete this task?")) return;
+ 
+      const taskToDelete = tasks.find(t => t.id === id);
+      if (!taskToDelete) return;
+ 
+      // Optimistic update
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+ 
+      try {
+        const res = await request(`https://localhost:7179/tasks/${id}`, {
+          method: "DELETE",
+        });
+ 
+        if (!res.ok) throw new Error("Failed to delete");
+ 
+        alert("Task deleted");
+      } catch (err) {
+        // Rollback
+        setTasks((prev) => [...prev, taskToDelete]);
+        alert("Ocurrió un error inesperado");
+      }
+  }
 
 
   async function updateTask() {
     if (!editingTask) return;
 
-    const res = await request(
-      `https://localhost:7179/tasks/${editingTask.id || (editingTask as any).Id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(editForm),
+    try {
+      const res = await request(
+        `https://localhost:7179/tasks/${editingTask.id || (editingTask as any).Id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(editForm),
+        }
+      );
+
+      if (res.ok) {
+        await loadTasks();
+        setEditingTask(null);
+        return;
       }
-    );
 
-    if (res.ok) {
-      await loadTasks();
-      setEditingTask(null);
-      return;
+      alert("Ocurrió un error inesperado");
+    } catch (err) {
+      alert("Ocurrió un error inesperado");
     }
-
-    alert("Failed to update task");
   }
 
   if (loading) {

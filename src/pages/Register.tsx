@@ -8,19 +8,23 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("https://localhost:7179/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("https://localhost:7179/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
-      alert("Registration failed");
-      return;
+      if (!res.ok) {
+        alert("Ocurrió un error inesperado");
+        return;
+      }
+
+      alert("Registration successful! Please login.");
+      window.location.href = "/";
+    } catch (error) {
+      alert("Error de conexión. Verifica que el backend esté ejecutándose.");
     }
-
-    alert("Registration successful! Please login.");
-    window.location.href = "/";
   };
 
   return (
