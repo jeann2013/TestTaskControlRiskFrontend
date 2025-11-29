@@ -1,73 +1,173 @@
-# React + TypeScript + Vite
+# 🖥️ TaskManager Frontend — React + Vite + TailwindCSS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación frontend del proyecto **TaskManager**, desarrollada con **React**, **Vite**, **TypeScript** y **TailwindCSS**.
+Este frontend consume la API del backend para gestionar tareas, autenticar usuarios con JWT y mostrar análisis de IA.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Características principales
 
-## React Compiler
+* Login y registro de usuarios
+* Listado y creación de tareas
+* Completado de tareas
+* Llamadas al servicio IA:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+  * **Análisis de tareas (resumen y prioridad)**
+  * **Generación de subtareas**
+* Cliente HTTP centralizado (`useApi.ts`)
+* Interfaz moderna con TailwindCSS
+* Integración con React Router
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# 📦 Instalación del Frontend
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 1️⃣ Requisitos previos
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Asegúrate de tener instalado:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+* **Node.js 18+**
+* **npm** o **yarn**
+* Backend ejecutándose en:
+
+  ```
+  https://localhost:7179
+  ```
+
+---
+
+## 2️⃣ Clonar el repositorio
+
+```bash
+git clone https://github.com/jeann2013/TestTaskControlRiskFrontend.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Luego entra al frontend:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd TestTaskControlRiskFrontend
 ```
+
+---
+
+## 3️⃣ Instalar dependencias
+
+```bash
+npm install
+```
+
+---
+
+## 4️⃣ Archivo de configuración `.env`
+
+Crear un archivo `.env` en la raíz del frontend:
+
+```
+VITE_API_URL=https://localhost:7179
+```
+
+---
+
+## 5️⃣ Ejecutar el proyecto en modo desarrollo
+
+```bash
+npm run dev
+```
+
+La aplicación abrirá en:
+
+```
+http://localhost:5173
+```
+
+---
+
+# 🏗️ Estructura del Proyecto
+
+```
+taskmanager-frontend/
+│
+├── src/
+│   ├── pages/
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx
+│   │   ├── TasksPage.tsx
+│   │   └── AnalyzeTask.tsx
+│   │
+│   ├── components/
+│   │   ├── Navbar.tsx
+│   │   └── TaskCard.tsx
+│   │
+│   ├── hooks/
+│   │   └── useApi.ts
+│   │
+│   ├── context/
+│   │   └── AuthContext.tsx
+│   │
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+│
+├── public/
+│
+├── vite.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+# 🔌 Comunicación con el Backend
+
+El frontend consume la API mediante el hook:
+
+```
+src/hooks/useApi.ts
+```
+
+Incluye:
+
+* Headers automáticos
+* Token JWT desde localStorage
+* Manejo de errores
+* Cliente unificado
+
+---
+
+# 🧪 Scripts disponibles
+
+| Script            | Descripción                       |
+| ----------------- | --------------------------------- |
+| `npm run dev`     | Ejecuta la app en modo desarrollo |
+| `npm run build`   | Crea el build de producción       |
+| `npm run preview` | Previsualiza el build             |
+
+---
+
+# 📄 Build de producción
+
+Ejecutar:
+
+```bash
+npm run build
+```
+
+Luego:
+
+```bash
+npm run preview
+```
+
+Se abrirá un servidor local para probar el build.
+
+---
+
+# 💡 Notas
+
+* Si cambias la URL del backend, actualiza el `.env`.
+* TailwindCSS recompilará la UI automáticamente.
+* La app se integra automáticamente con los endpoints `/tasks`, `/auth`, `/tasks/analyze`, `/tasks/suggest`.
+
+---
+
+¿Quieres también un README para el backend o uno combinado para todo el proyecto?
