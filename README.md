@@ -141,6 +141,7 @@ Incluye:
 | `npm run dev`     | Ejecuta la app en modo desarrollo |
 | `npm run build`   | Crea el build de producción       |
 | `npm run preview` | Previsualiza el build             |
+| `npm test`     | Ejecuta los Tests |
 
 ---
 
