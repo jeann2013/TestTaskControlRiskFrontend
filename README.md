@@ -70,7 +70,9 @@ VITE_API_URL=https://localhost:7179
 
 ---
 
-## 5️⃣ Ejecutar el proyecto en modo desarrollo
+## 5️⃣ Ejecutar el proyecto
+
+### Opción A: Desarrollo local
 
 ```bash
 npm run dev
@@ -81,6 +83,22 @@ La aplicación abrirá en:
 ```
 http://localhost:5173
 ```
+
+### Opción B: Usando Docker Compose
+
+Asegúrate de tener Docker y Docker Compose instalados.
+
+```bash
+docker-compose up --build
+```
+
+La aplicación estará disponible en:
+
+```
+http://localhost:5173
+```
+
+**Nota**: El backend debe estar ejecutándose en `https://localhost:7179` para que el frontend funcione completamente.
 
 ---
 
