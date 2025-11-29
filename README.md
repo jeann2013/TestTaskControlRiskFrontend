@@ -200,6 +200,44 @@ La aplicación frontend consume los siguientes endpoints del backend:
 
 ---
 
+# 🏛️ Arquitectura del Sistema
+
+```mermaid
+graph TB
+    A[Usuario] --> B[React Frontend]
+    B --> C[ASP.NET Core API]
+
+    C --> D{JWT Authentication<br/>& Roles}
+    D --> E[SQL Server<br/>Usuarios & Auth]
+    D --> F[CosmosDB<br/>Tareas]
+
+    C --> G[Servicios IA]
+    G --> H[HuggingFace<br/>Azure Cognitive<br/>OpenAI GPT-4o mini]
+
+    E --> C
+    F --> C
+    H --> C
+    C --> B
+    B --> A
+
+    style B fill:#e1f5fe
+    style C fill:#f3e5f5
+    style E fill:#e8f5e8
+    style F fill:#fff3e0
+    style H fill:#fce4ec
+```
+
+**Flujo de Datos:**
+1. El usuario interactúa con la interfaz React
+2. React realiza llamadas HTTP a la API ASP.NET Core
+3. La API valida JWT y roles de usuario
+4. Datos de usuarios se almacenan en SQL Server
+5. Datos de tareas se almacenan en CosmosDB
+6. Para análisis IA, la API llama a servicios externos
+7. Respuestas fluyen de vuelta al frontend
+
+---
+
 # 💡 Notas
 
 * Si cambias la URL del backend, actualiza el `.env`.
