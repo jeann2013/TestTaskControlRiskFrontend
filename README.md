@@ -8,13 +8,15 @@ Este frontend consume la API del backend para gestionar tareas, autenticar usuar
 ## 🚀 Características principales
 
 * Login y registro de usuarios
-* Listado y creación de tareas
+* Gestión de roles (Admin/User) con restricciones de acceso
+* Listado, creación, edición y eliminación de tareas
 * Completado de tareas
 * Llamadas al servicio IA:
 
   * **Análisis de tareas (resumen y prioridad)**
   * **Generación de subtareas**
-* Cliente HTTP centralizado (`useApi.ts`)
+* Cliente HTTP centralizado con refresh automático de tokens (`useApi.ts`)
+* Error Boundary para manejo de errores en la UI
 * Interfaz moderna con TailwindCSS
 * Integración con React Router
 
@@ -88,21 +90,26 @@ http://localhost:5173
 taskmanager-frontend/
 │
 ├── src/
+│   ├── auth/
+│   │   ├── useAuthStore.js
+│   │   └── ProtectedRoute.jsx
+│   │
+│   ├── components/
+│   │   ├── ErrorBoundary.tsx
+│   │   └── PrivateRoute.tsx
+│   │
+│   ├── hooks/
+│   │   ├── useApi.ts
+│   │   └── useAuth.js
+│   │
 │   ├── pages/
 │   │   ├── Login.tsx
 │   │   ├── Register.tsx
 │   │   ├── TasksPage.tsx
-│   │   └── AnalyzeTask.tsx
+│   │   └── CreateTaskPage.tsx
 │   │
-│   ├── components/
-│   │   ├── Navbar.tsx
-│   │   └── TaskCard.tsx
-│   │
-│   ├── hooks/
-│   │   └── useApi.ts
-│   │
-│   ├── context/
-│   │   └── AuthContext.tsx
+│   ├── api/
+│   │   └── client.js
 │   │
 │   ├── App.tsx
 │   ├── main.tsx
@@ -112,6 +119,12 @@ taskmanager-frontend/
 │
 ├── vite.config.ts
 ├── tsconfig.json
+├── tsconfig.app.json
+├── tsconfig.jest.json
+├── tsconfig.node.json
+├── jest.config.cjs
+├── tailwind.config.js
+├── postcss.config.js
 └── package.json
 ```
 
@@ -127,10 +140,10 @@ src/hooks/useApi.ts
 
 Incluye:
 
-* Headers automáticos
-* Token JWT desde localStorage
-* Manejo de errores
-* Cliente unificado
+* Headers automáticos con Authorization Bearer
+* Gestión de tokens JWT con refresh automático
+* Manejo de errores y logout en 401
+* Cliente unificado para todas las llamadas autenticadas
 
 ---
 
@@ -163,11 +176,36 @@ Se abrirá un servidor local para probar el build.
 
 ---
 
+# 📚 Documentación de la API
+
+La aplicación frontend consume los siguientes endpoints del backend:
+
+## Autenticación
+- `POST /auth/login` - Login de usuario (devuelve token y refreshToken)
+- `POST /auth/register` - Registro de usuario
+- `POST /auth/refresh` - Refresh del token JWT
+
+## Tareas
+- `GET /tasks?Page=1&PageSize=10` - Listar tareas paginadas
+- `POST /tasks` - Crear nueva tarea
+- `PUT /tasks/{id}` - Actualizar tarea
+- `DELETE /tasks/{id}` - Eliminar tarea
+- `PATCH /tasks/{id}/complete` - Marcar tarea como completada
+
+## IA
+- `POST /tasks/analyze` - Analizar tarea (resumen y prioridad)
+- `POST /tasks/suggest` - Generar subtareas sugeridas
+
+**Nota**: El backend debería proporcionar documentación Swagger/OpenAPI en una ruta como `/swagger` para referencia completa.
+
+---
+
 # 💡 Notas
 
 * Si cambias la URL del backend, actualiza el `.env`.
 * TailwindCSS recompilará la UI automáticamente.
-* La app se integra automáticamente con los endpoints `/tasks`, `/auth`, `/tasks/analyze`, `/tasks/suggest`.
+* La app incluye manejo de roles: solo Admin puede crear y eliminar tareas.
+* Error Boundary captura errores de UI y muestra mensajes amigables.
 
 ---
 
