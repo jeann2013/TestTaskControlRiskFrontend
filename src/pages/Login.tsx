@@ -34,7 +34,19 @@ export default function Login() {
     const token = data.Token || data.token || data.access_token || data.accessToken || data.AccessToken;
     const refreshToken = data.RefreshToken || data.refresh_token || data.refreshToken;
     console.log("Parsed token:", token);
-    setAuth({ token, refreshToken, user: data.user });
+
+    // Decode JWT to get role
+    let role = null;
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role;
+      } catch (e) {
+        console.error("Failed to decode token:", e);
+      }
+    }
+
+    setAuth({ token, refreshToken, user: data.user, role });
 
     // Redirigir
     window.location.href = "/tasks";

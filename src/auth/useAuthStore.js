@@ -4,17 +4,19 @@ const getInitialState = () => {
   const token = localStorage.getItem("token");
   const refreshToken = localStorage.getItem("refreshToken");
   const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
-  return { token, refreshToken, user };
+  const role = localStorage.getItem("role");
+  return { token, refreshToken, user, role };
 };
 
 export const useAuthStore = create((set) => ({
   ...getInitialState(),
 
-  setAuth: ({ token, refreshToken, user }) => {
+  setAuth: ({ token, refreshToken, user, role }) => {
     localStorage.setItem("token", token);
     if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
     if (user) localStorage.setItem("user", JSON.stringify(user));
-    set({ token, refreshToken, user });
+    if (role) localStorage.setItem("role", role);
+    set({ token, refreshToken, user, role });
   },
 
   setToken: (token) => {
@@ -26,6 +28,7 @@ export const useAuthStore = create((set) => ({
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
-    set({ token: null, refreshToken: null, user: null });
+    localStorage.removeItem("role");
+    set({ token: null, refreshToken: null, user: null, role: null });
   },
 }));

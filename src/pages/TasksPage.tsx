@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useApi from "../hooks/useApi";
+import { useAuthStore } from "../auth/useAuthStore";
 
 interface TaskItem {
   id: string;
@@ -11,6 +12,7 @@ interface TaskItem {
 
 export default function TasksPage() {
   const { request } = useApi();
+  const { role } = useAuthStore();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -161,15 +163,17 @@ async function suggestSubtasks(task: TaskItem) {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Your Tasks</h1>
+      <h1 className="text-3xl font-bold mb-6">Your Tasks (Role: {role})</h1>
 
       <div className="flex justify-end mb-4">
-        <a
-          href="/create"
-          className="bg-blue-600 px-3 py-2 rounded"
-        >
-          + Add Task
-        </a>
+        {role === 'Admin' && (
+          <a
+            href="/create"
+            className="bg-blue-600 px-3 py-2 rounded"
+          >
+            + Add Task
+          </a>
+        )}
       </div>
 
       {tasks.length === 0 ? (
@@ -206,12 +210,14 @@ async function suggestSubtasks(task: TaskItem) {
                 </button>
               )}
 
-              <button
-                className="bg-red-600 px-3 py-1 rounded"
-                onClick={() => deleteTask(task.id || (task as any).Id)}
-              >
-                Delete
-              </button>
+              {role === 'Admin' && (
+                <button
+                  className="bg-red-600 px-3 py-1 rounded"
+                  onClick={() => deleteTask(task.id || (task as any).Id)}
+                >
+                  Delete
+                </button>
+              )}
 
               <button
                 className="bg-purple-600 px-3 py-1 rounded"
