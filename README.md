@@ -263,6 +263,4 @@ graph TB
 * La app incluye manejo de roles: solo Admin puede crear y eliminar tareas.
 * Error Boundary captura errores de UI y muestra mensajes amigables.
 
----
 
-¿Quieres también un README para el backend o uno combinado para todo el proyecto?
